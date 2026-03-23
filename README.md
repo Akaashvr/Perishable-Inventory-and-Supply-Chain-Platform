@@ -154,4 +154,6 @@ For the bonus requirement, `security.sql` creates two application roles:
 Create a `.env` file in the project root:
 
 ```env
-DATABASE_URL= (our url that we got from neon 
+DATABASE_URL= (our url that we got from neon)
+
+YouTube link - https://youtu.be/H3kzdN9K7yk
