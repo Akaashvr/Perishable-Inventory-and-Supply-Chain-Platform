@@ -1,0 +1,42 @@
+version: 2
+
+models:
+  - name: dim_product
+    columns:
+      - name: product_id
+        tests:
+          - not_null
+          - unique
+
+  - name: dim_store
+    columns:
+      - name: store_id
+        tests:
+          - not_null
+          - unique
+
+  - name: dim_supplier
+    columns:
+      - name: supplier_id
+        tests:
+          - not_null
+          - unique
+
+  - name: fact_inventory
+    columns:
+      - name: transaction_id
+        tests:
+          - not_null
+          - unique
+
+      - name: product_id
+        tests:
+          - not_null
+
+      - name: store_id
+        tests:
+          - not_null
+
+      - name: supplier_id
+        tests:
+          - not_null
