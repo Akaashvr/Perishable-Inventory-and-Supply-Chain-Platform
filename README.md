@@ -1,159 +1,191 @@
 # Perishable Inventory and Supply Chain Platform
 
-This repository contains Phase 1 of the EAS 550 project: infrastructure provisioning, relational modeling, and data ingestion for a perishable goods dataset using Neon PostgreSQL, SQL, Python, Pandas, and SQLAlchemy.
+This repository contains our EAS 550 project, where we built a complete data pipeline for a perishable goods dataset. The project is divided into two phases:
+
+* **Phase 1:** Database design, normalization, and data ingestion
+* **Phase 2:** Data transformation, analytics, quality checks, and CI/CD
+
+---
 
 ## Project Overview
 
-The goal of this phase was to take the raw perishable goods dataset and load it into a normalized PostgreSQL database hosted on Neon. The database schema was designed in Third Normal Form (3NF) to reduce redundancy, avoid update/insert/delete anomalies, and enforce data integrity using primary keys, foreign keys, unique constraints, and check constraints.
+The goal of this project was to take a raw perishable goods dataset and turn it into a structured system that supports both reliable storage and analytical queries.
 
-The raw dataset includes product, category, store, region, supplier, pricing, demand, waste, promotion, and date-related fields. These were transformed into a structured relational design suitable for analytics and future application development.
+In Phase 1, we focused on building a clean relational database using PostgreSQL. In Phase 2, we transformed that data into an analytics-friendly format using dbt and added testing, performance improvements, and automation.
 
-## What Has Been Completed
+---
 
-The following Phase 1 work has been completed:
+## Phase 1: OLTP Design and Data Ingestion
 
-- Created a Neon PostgreSQL database instance
-- Designed an ERD for the dataset
-- Built a normalized relational schema in PostgreSQL
-- Wrote and ran `schema.sql` on Neon
-- Wrote a Python ingestion pipeline in `ingest_data.py`
-- Cleaned and transformed the raw CSV data using Pandas
-- Loaded data into the database in the correct foreign key order
-- Used `pandas.to_sql(..., if_exists="append")` as required
-- Made the ingestion process idempotent using conflict-safe inserts
-- Ran the ingestion script twice successfully
-- Verified that the second run inserted 0 new inventory transaction rows
-- Added an RBAC script in `security.sql` for the bonus requirement
-- Used SQLAlchemy `NullPool` to avoid unnecessary idle Neon connections
+In Phase 1, we designed a normalized schema (3NF) to store the dataset efficiently and avoid redundancy.
 
-## Database Design
+### What we did
 
-The schema includes the following normalized tables:
+* Created a Neon PostgreSQL database
+* Designed an ERD for the dataset
+* Built a normalized schema using SQL
+* Implemented data cleaning and ingestion using Python (Pandas + SQLAlchemy)
+* Loaded data into the database in the correct order to maintain foreign key constraints
+* Ensured the ingestion process was **idempotent** (running it multiple times does not create duplicates)
+* Added role-based access control using SQL
 
-- `regions`
-- `categories`
-- `stores`
-- `suppliers`
-- `products`
-- `promotions`
-- `product_promotions`
-- `inventory_transactions`
+### Main tables
 
-### Design Notes
+* `regions`
+* `categories`
+* `stores`
+* `suppliers`
+* `products`
+* `promotions`
+* `product_promotions`
+* `inventory_transactions`
 
-- `regions` stores unique region names
-- `categories` stores unique product categories
-- `stores` references `regions`
-- `suppliers` stores supplier identifiers and supplier scores
-- `products` stores product-level descriptive information and references `categories`
-- `promotions` stores promotion names and discount percentages
-- `product_promotions` resolves the many-to-many relationship between products and promotions
-- `inventory_transactions` stores the main transactional records and references products, stores, and suppliers
+### Files
 
-The schema enforces data integrity using:
+* `schema.sql` – database schema
+* `ingest_data.py` – data ingestion pipeline
+* `security.sql` – RBAC setup
+* `3nf_justification.md` – normalization explanation
+* `ERD.png` – database design diagram
 
-- `PRIMARY KEY`
-- `FOREIGN KEY`
-- `NOT NULL`
-- `UNIQUE`
-- `CHECK`
+---
 
-Additional indexes were created on `inventory_transactions` to improve lookup performance by product, store, supplier, and expiration date.
+## Phase 2: Analytics with dbt
 
-## Files in This Repository
+In Phase 2, we built an analytics layer on top of the normalized database using dbt.
 
-- `schema.sql`  
-  PostgreSQL schema definition for all project tables, constraints, indexes, and trigger
+### Star Schema
 
-- `ingest_data.py`  
-  Python ingestion pipeline that cleans, transforms, and loads the CSV data into Neon PostgreSQL
+We transformed the OLTP schema into a Star Schema to support analytical queries:
 
-- `security.sql`  
-  Bonus RBAC script that creates analyst and application roles with controlled privileges
+* `fact_inventory` (central fact table)
+* `dim_product`
+* `dim_store`
+* `dim_supplier`
 
-- `3nf_justification.md`  
-  Explanation of normalization and design choices
+The diagram is available in **`star_schema.png`**.
 
-- `ERD.png`  
-  Entity Relationship Diagram for the final schema
+---
 
-## Data Cleaning and Transformation
+### dbt Models
 
-The ingestion pipeline performs the following steps:
+We used dbt to create modular SQL transformations:
 
-- Reads the raw CSV file
-- Standardizes column names
-- Validates required columns
-- Converts transaction and expiration date fields
-- Removes rows with invalid dates
-- Swaps incorrect date pairs where expiration is earlier than transaction date
-- Converts numeric and boolean-like columns into proper types
-- Fills missing values using safe defaults or medians where appropriate
-- Buckets continuous demand values into `Low`, `Medium`, and `High`
-- Buckets spoilage sensitivity into `Low`, `Medium`, and `High`
-- Derives promotion flags based on promotion-related fields
-- Maps raw dataset columns into the normalized schema fields
-- Removes exact duplicate rows before loading
+* Built dimension and fact tables inside `dbt_project/models`
+* Used joins and transformations to create clean, analysis-ready data
+* Organized everything in a structured and reusable way
 
-## Ingestion Strategy
+---
 
-The ingestion pipeline uses a temporary staging table called `stg_perishable_raw`.
+### Data Quality Checks
 
-The cleaned CSV data is first loaded into staging, and then inserted into the normalized tables in this order:
+We added dbt tests to make sure the data is reliable:
 
-1. `regions`
-2. `categories`
-3. `stores`
-4. `suppliers`
-5. `products`
-6. `promotions`
-7. `product_promotions`
-8. `inventory_transactions`
+* `not_null` tests on important fields
+* `unique` tests on primary keys
+* Basic checks to ensure consistency between fact and dimension tables
 
-This order ensures that all foreign key dependencies are satisfied.
+---
 
-## Idempotency
+### Analytical Queries
 
-The ingestion script is designed to be idempotent.
+We wrote three SQL queries to extract insights:
 
-This means the script can be run multiple times without creating duplicate records or corrupting the database.
+1. **Waste analysis** (using CTEs)
+2. **Supplier ranking** (using window functions)
+3. **Demand trends** (using moving averages over time)
 
-This was validated by running the script twice:
+These are located in `dbt_project/analyses`.
 
-- first run: `inventory_transactions inserted this run: 100000`
-- second run: `inventory_transactions inserted this run: 0`
+---
 
-Dimension and bridge table inserts also use conflict-safe logic to prevent duplication.
+### Performance Optimization
 
-## Resource Monitoring and Connection Handling
+We analyzed query performance using `EXPLAIN ANALYZE`.
 
-Neon free-tier usage was considered during implementation.
+* Initially, the query performed a sequential scan (~850 ms)
+* We added an index on `(product_id, transaction_date)`
+* After optimization, execution time reduced to ~140 ms (~6x faster)
 
-To avoid keeping unnecessary idle connections open, the SQLAlchemy engine uses `NullPool`. This allows the connection to close after use and helps Neon auto-pause correctly instead of consuming compute hours due to open pooled connections.
+Details are included in `performance_report.md`.
 
-## Security
+---
 
-Sensitive database credentials are not hardcoded in the Python script.
+### CI/CD Pipeline
 
-The ingestion script reads `DATABASE_URL` from environment variables using a local `.env` file.
+We set up a CI/CD workflow using GitHub Actions:
 
-The repository is intended to exclude `.env` from version control.
+* Runs automatically on pull requests
+* Installs dbt and executes tests
+* Helps ensure code quality before merging
 
-For the bonus requirement, `security.sql` creates two application roles:
+Note: The pipeline may fail due to missing database credentials in GitHub. In a real-world setup, this would be handled using GitHub Secrets.
 
-- `perishable_analyst`  
-  Select-only access
+---
 
-- `perishable_app_user`  
-  Select, insert, and update access
+### dbt Documentation
 
-## How to Run
+We generated interactive documentation using:
 
-### 1. Add environment variable
+```bash
+dbt docs generate
+dbt docs serve
+```
 
-Create a `.env` file in the project root:
+This allows us to view models, columns, and relationships in a UI.
+
+---
+
+## How to Run the Project
+
+### 1. Set up environment variables
+
+Create a `.env` file:
 
 ```env
-DATABASE_URL= (our url that we got from neon)
+DATABASE_URL=your_neon_database_url
+```
 
-YouTube link - https://youtu.be/H3kzdN9K7yk
+---
+
+### 2. Run ingestion
+
+```bash
+python ingest_data.py
+```
+
+---
+
+### 3. Run dbt models
+
+```bash
+cd dbt_project
+dbt run
+```
+
+---
+
+### 4. Run tests
+
+```bash
+dbt test
+```
+
+---
+
+## Summary
+
+This project demonstrates a complete data pipeline:
+
+* Structured OLTP design (Phase 1)
+* Star Schema transformation (Phase 2)
+* Data validation using dbt tests
+* Analytical query development
+* Performance optimization using indexing
+* CI/CD automation using GitHub Actions
+
+---
+
+## Demo
+
+YouTube link: https://youtu.be/H3kzdN9K7yk
