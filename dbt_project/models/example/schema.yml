@@ -1,21 +1,42 @@
-
 version: 2
 
 models:
-  - name: my_first_dbt_model
-    description: "A starter dbt model"
+  - name: dim_product
     columns:
-      - name: id
-        description: "The primary key for this table"
-        data_tests:
+      - name: product_id
+        tests:
+          - not_null
           - unique
+
+  - name: dim_store
+    columns:
+      - name: store_id
+        tests:
+          - not_null
+          - unique
+
+  - name: dim_supplier
+    columns:
+      - name: supplier_id
+        tests:
+          - not_null
+          - unique
+
+  - name: fact_inventory
+    columns:
+      - name: transaction_id
+        tests:
+          - not_null
+          - unique
+
+      - name: product_id
+        tests:
           - not_null
 
-  - name: my_second_dbt_model
-    description: "A starter dbt model"
-    columns:
-      - name: id
-        description: "The primary key for this table"
-        data_tests:
-          - unique
+      - name: store_id
+        tests:
+          - not_null
+
+      - name: supplier_id
+        tests:
           - not_null
