@@ -20,13 +20,47 @@ jobs:
 
       - name: Install dependencies
         run: |
-          pip install dbt-postgres sqlfluff
+          pip install "dbt-postgres==1.10.0"
+          pip install "sqlfluff==3.0.7"
+          pip install "sqlfluff-templater-dbt==3.0.7"
 
+      - name: Create dbt profile
+        env:
+          DB_HOST: ${{ secrets.DB_HOST }}
+          DB_USER: ${{ secrets.DB_USER }}
+          DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
+          DB_PORT: ${{ secrets.DB_PORT }}
+          DB_NAME: ${{ secrets.DB_NAME }}
+        run: |
+          mkdir -p ~/.dbt
+          cat > ~/.dbt/profiles.yml << EOF
+          dbt_project:
+            target: dev
+            outputs:
+              dev:
+                type: postgres
+                host: "${DB_HOST}"
+                user: "${DB_USER}"
+                password: "${DB_PASSWORD}"
+                port: ${DB_PORT}
+                database: "${DB_NAME}"
+                schema: public
+                threads: 1
+                sslmode: require
+          EOF
+
+      - name: Clear SQLFluff cache
+        run: rm -rf ~/.cache/sqlfluff || true
+        
       - name: Lint SQL with SQLFluff
-        run: sqlfluff lint dbt_project
+        run: sqlfluff lint dbt_project/models dbt_project/analyses
 
       - name: Install dbt packages
         run: dbt deps
+        working-directory: dbt_project
+
+      - name: Run dbt models
+        run: dbt run
         working-directory: dbt_project
 
       - name: Run dbt tests
