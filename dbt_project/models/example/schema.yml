@@ -32,11 +32,20 @@ models:
       - name: product_id
         tests:
           - not_null
+          - relationships:
+              to: ref('dim_product')
+              field: product_id
 
       - name: store_id
         tests:
           - not_null
+          - relationships:
+              to: ref('dim_store')
+              field: store_id
 
       - name: supplier_id
         tests:
           - not_null
+          - relationships:
+              to: ref('dim_supplier')
+              field: supplier_id
