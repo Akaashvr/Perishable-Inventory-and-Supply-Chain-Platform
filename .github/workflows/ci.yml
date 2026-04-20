@@ -43,6 +43,9 @@ jobs:
                 sslmode: require
           " > ~/.dbt/profiles.yml
 
+      - name: Debug profile
+        run: cat ~/.dbt/profiles.yml
+
       - name: Clear SQLFluff cache
         run: rm -rf ~/.cache/sqlfluff || true
         
