@@ -20,10 +20,10 @@ jobs:
 
       - name: Install dependencies
         run: |
-          pip install dbt-postgres sqlfluff
+          pip install dbt-postgres sqlfluff sqlfluff-templater-dbt
 
       - name: Lint SQL with SQLFluff
-        run: sqlfluff lint dbt_project || true
+        run: sqlfluff lint dbt_project
 
       - name: Install dbt packages
         run: dbt deps
