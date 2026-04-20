@@ -44,7 +44,7 @@ jobs:
           " > ~/.dbt/profiles.yml
 
       - name: Lint SQL with SQLFluff
-        run: sqlfluff lint dbt_project/models dbt_project/analyses
+        run: sqlfluff lint dbt_project/models dbt_project/analyses --disable-progress-bar
 
       - name: Install dbt packages
         run: dbt deps
