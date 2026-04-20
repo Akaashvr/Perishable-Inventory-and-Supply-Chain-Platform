@@ -49,9 +49,6 @@ jobs:
                 sslmode: require
           EOF
 
-      - name: Debug profile
-        run: cat ~/.dbt/profiles.yml
-
       - name: Clear SQLFluff cache
         run: rm -rf ~/.cache/sqlfluff || true
         
