@@ -43,6 +43,9 @@ jobs:
                 sslmode: require
           " > ~/.dbt/profiles.yml
 
+      - name: Clear SQLFluff cache
+        run: rm -rf ~/.cache/sqlfluff || true
+        
       - name: Lint SQL with SQLFluff
         run: sqlfluff lint dbt_project/models dbt_project/analyses
 
