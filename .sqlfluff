@@ -1,3 +1,10 @@
 [sqlfluff]
 dialect = postgres
-templater = jinja
+templater = dbt
+exclude_rules = AM04, RF02
+
+[sqlfluff:templater:dbt]
+project_dir = dbt_project
+
+[sqlfluff:paths]
+exclude = dbt_project/target, dbt_project/logs
