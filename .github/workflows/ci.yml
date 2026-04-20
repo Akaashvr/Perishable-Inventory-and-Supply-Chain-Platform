@@ -18,10 +18,14 @@ jobs:
         with:
           python-version: '3.11'
 
-      - name: Install dbt
-        run: pip install dbt-postgres
-
       - name: Install dependencies
+        run: |
+          pip install dbt-postgres sqlfluff
+
+      - name: Lint SQL with SQLFluff
+        run: sqlfluff lint dbt_project
+
+      - name: Install dbt packages
         run: dbt deps
         working-directory: dbt_project
 
