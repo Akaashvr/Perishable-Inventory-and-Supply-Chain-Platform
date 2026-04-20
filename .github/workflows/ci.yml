@@ -25,23 +25,29 @@ jobs:
           pip install "sqlfluff-templater-dbt==3.0.7"
 
       - name: Create dbt profile
+        env:
+          DB_HOST: ${{ secrets.DB_HOST }}
+          DB_USER: ${{ secrets.DB_USER }}
+          DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
+          DB_PORT: ${{ secrets.DB_PORT }}
+          DB_NAME: ${{ secrets.DB_NAME }}
         run: |
           mkdir -p ~/.dbt
-          echo "
+          cat > ~/.dbt/profiles.yml << EOF
           dbt_project:
             target: dev
             outputs:
               dev:
                 type: postgres
-                host: ${{ secrets.DB_HOST }}
-                user: ${{ secrets.DB_USER }}
-                password: ${{ secrets.DB_PASSWORD }}
-                port: ${{ secrets.DB_PORT }}
-                database: ${{ secrets.DB_NAME }}
+                host: "${DB_HOST}"
+                user: "${DB_USER}"
+                password: "${DB_PASSWORD}"
+                port: ${DB_PORT}
+                database: "${DB_NAME}"
                 schema: public
                 threads: 1
                 sslmode: require
-          " > ~/.dbt/profiles.yml
+          EOF
 
       - name: Debug profile
         run: cat ~/.dbt/profiles.yml
