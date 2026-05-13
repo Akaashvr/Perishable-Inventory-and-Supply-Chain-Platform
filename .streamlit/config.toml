@@ -1,0 +1,31 @@
+# Streamlit configuration for the Perishable Inventory dashboard.
+# These defaults work for both local development and the Render deployment.
+
+[theme]
+# A clean, slightly cool palette that reads well for an inventory product.
+primaryColor = "#10B981"            # emerald-500
+backgroundColor = "#FFFFFF"
+secondaryBackgroundColor = "#F1F5F9" # slate-100
+textColor = "#0F172A"               # slate-900
+font = "sans serif"
+
+[server]
+# Render injects $PORT — the Procfile / render.yaml startCommand uses it.
+# Headless mode disables Streamlit's "open in browser" prompt and is
+# required for non-interactive (containerised) environments.
+headless = true
+# We sit behind Render's TLS terminator, so we don't run our own.
+enableCORS = false
+enableXsrfProtection = true
+# Bumping the upload size limit isn't needed — the app doesn't accept
+# user file uploads — but we set it explicitly for clarity.
+maxUploadSize = 50
+
+[browser]
+# Don't phone home for usage stats.
+gatherUsageStats = false
+
+[client]
+# Show prettier error pages to end-users; full tracebacks still go to logs.
+showErrorDetails = false
+toolbarMode = "minimal"

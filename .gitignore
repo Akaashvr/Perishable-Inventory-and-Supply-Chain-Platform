@@ -1,11 +1,16 @@
 # Python
 __pycache__/
 *.pyc
+*.pyo
+*.pyd
 .venv/
 venv/
+*.egg-info/
 
 # Environment
 .env
+.env.local
+.env.*.local
 
 # OS/editor
 .DS_Store
@@ -16,4 +21,14 @@ Thumbs.db
 # Jupyter
 .ipynb_checkpoints/
 
+# dbt
+dbt_project/target/
+dbt_project/logs/
+dbt_project/dbt_packages/
+
+# Streamlit
+.streamlit/secrets.toml
+
+# Logs
 logs/
+*.log
