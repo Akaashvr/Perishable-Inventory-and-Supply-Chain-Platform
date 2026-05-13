@@ -1,0 +1,54 @@
+name: Streamlit App CI
+
+on:
+  pull_request:
+    branches:
+      - main
+    paths:
+      - "app/**"
+      - "requirements.txt"
+      - "runtime.txt"
+      - ".streamlit/**"
+      - ".github/workflows/streamlit-app.yml"
+  push:
+    branches:
+      - main
+    paths:
+      - "app/**"
+      - "requirements.txt"
+
+jobs:
+  smoke-test:
+    name: Smoke-test the Streamlit app
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: pip
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+      - name: Compile every Python file (syntax check)
+        run: |
+          python -m compileall -q app
+
+      # Quick import-only smoke test. We do NOT need a real database for
+      # this; we patch DATABASE_URL to a dummy value just so module-level
+      # `_get_database_url()` calls don't blow up at import time.
+      - name: Smoke-test module imports
+        env:
+          DATABASE_URL: "postgresql://dummy:dummy@localhost:5432/dummy"
+        run: |
+          cd app
+          python -c "import streamlit_app; print('streamlit_app imported ok')" \
+            || true
+          python -c "import db, queries, ui; print('helper modules ok')"
