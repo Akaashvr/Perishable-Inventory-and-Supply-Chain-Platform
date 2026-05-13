@@ -1,28 +1,15 @@
-# render.yaml — Infrastructure-as-Code blueprint for Render.
-#
-# Drop this file into the repo root, click "New → Blueprint" in the Render
-# dashboard, and point it at this GitHub repository. Render reads this
-# file and provisions the service automatically. Auto-deploy on push to
-# main is enabled by default — every commit to main triggers a rebuild.
-#
-# Docs: https://render.com/docs/blueprint-spec
-
 services:
   - type: web
     name: perishable-dashboard
     runtime: python
-    plan: free                # free tier: 512 MB RAM, spins down after idle
-    region: oregon            # closest to Neon US-East is also fine
+    plan: free
+    region: oregon
     branch: main
-    autoDeploy: true          # push to main → automatic redeploy
-    healthCheckPath: /_stcore/health   # Streamlit's built-in health endpoint
+    autoDeploy: true
+    healthCheckPath: /_stcore/health
     buildCommand: pip install --upgrade pip && pip install -r requirements.txt
     startCommand: streamlit run app/streamlit_app.py --server.port=$PORT --server.address=0.0.0.0 --server.headless=true --server.enableCORS=false
     envVars:
-      # IMPORTANT: DATABASE_URL is **not** committed. Set it via the
-      # Render dashboard → Environment, or paste it once when prompted
-      # during the blueprint's first apply. `sync: false` tells Render
-      # not to overwrite the value on subsequent applies.
       - key: DATABASE_URL
         sync: false
       - key: PYTHON_VERSION

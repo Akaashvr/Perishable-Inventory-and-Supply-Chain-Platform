@@ -1,7 +1,3 @@
-# Phase 3 — Streamlit dashboard runtime requirements.
-# Versions are pinned to known-good releases so Render builds are
-# reproducible.
-
 streamlit==1.39.0
 pandas==2.2.3
 SQLAlchemy==2.0.36
