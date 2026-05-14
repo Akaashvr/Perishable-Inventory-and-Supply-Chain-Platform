@@ -1,33 +1,25 @@
-"""
-theme.py — Visual system for the Perishable Supply Chain Dashboard.
-
-Palette is built around fresh-produce greens, ripeness oranges, cold-chain
-blues, and a deep-navy hex-grid background that evokes a distribution network.
-No emoji; icons are injected via Remixicon CDN inside HTML blocks.
-"""
-
 from __future__ import annotations
 import streamlit as st
 
-# ── Colour tokens ─────────────────────────────────────────────────────────────
+# Colour tokens 
 C = {
     # Backgrounds
-    "bg":        "#070D18",   # app canvas
-    "surface":   "#0C1827",   # card / panel
-    "surface2":  "#111F32",   # input / hover
-    "border":    "#1A2D42",   # soft border
-    "border2":   "#2A3F57",   # hover border
+    "bg":        "#070D18", 
+    "surface":   "#0D1726", 
+    "surface2":  "#111F32", 
+    "border":    "#1A2D42", 
+    "border2":   "#2A3F57", 
 
     # Brand
-    "green":     "#00C896",   # primary – fresh produce
+    "green":     "#00C896", 
     "green_dim": "#007A5A",
-    "orange":    "#FF8533",   # secondary – ripeness / warn
+    "orange":    "#FF8533",  
     "orange_dim":"#7A3D16",
-    "blue":      "#00A8E8",   # tertiary – cold-chain
+    "blue":      "#00A8E8", 
     "blue_dim":  "#004A6E",
-    "red":       "#FF4560",   # danger – spoilage
-    "purple":    "#9B59F5",   # promotions
-    "yellow":    "#FFD60A",   # expiry alert
+    "red":       "#FF4560", 
+    "purple":    "#9B59F5",
+    "yellow":    "#FFD60A", 
 
     # Text
     "text":      "#D9E5F2",
@@ -42,7 +34,7 @@ CHART_COLORS = [
     "#2ECC71", "#E74C3C", "#3498DB",
 ]
 
-# ── Plotly layout defaults ─────────────────────────────────────────────────────
+# Plotly layout defaults
 def plotly_layout(**overrides) -> dict:
     base = dict(
         paper_bgcolor="rgba(0,0,0,0)",
@@ -74,7 +66,7 @@ def plotly_layout(**overrides) -> dict:
     return base
 
 
-# ── CSS injection ──────────────────────────────────────────────────────────────
+# CSS injection
 _CSS = f"""
 /* ── Remixicon CDN ── */
 @import url('https://cdn.jsdelivr.net/npm/remixicon@3.5.0/fonts/remixicon.css');
@@ -511,16 +503,16 @@ def inject_css() -> None:
     st.markdown(f"<style>{_CSS}</style>", unsafe_allow_html=True)
 
 
-# ── HTML helpers ──────────────────────────────────────────────────────────────
+# HTML helpers
 
-def section_header(title: str, subtitle: str = "", icon_class: str = "ri-bar-chart-line",
+def section_header(title: str, subtitle: str = "", icon: str = "ri-bar-chart-line",
                    icon_bg: str | None = None) -> None:
     bg = icon_bg or f"rgba(0,200,150,.15)"
     st.markdown(
         f"""
         <div class="section-header">
           <div class="sh-icon" style="background:{bg}">
-            <i class="{icon_class}" style="color:{C['green']}"></i>
+            <i class="{icon}" style="color:{C['green']}"></i>
           </div>
           <div>
             <div class="sh-title">{title}</div>

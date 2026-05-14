@@ -1,17 +1,3 @@
-"""
-ui.py
-=====
-
-Small UI helpers shared across every dashboard page:
-
-* ``render_sidebar_filters()`` — the single source of truth for filter
-  widgets. Each page calls this exactly once, then passes the returned
-  dict into the query layer.
-* ``fmt_*`` — formatting helpers for currency / large numbers.
-* ``render_db_status()`` — sidebar health indicator with a refresh button
-  that clears Streamlit's data cache.
-"""
-
 from __future__ import annotations
 
 from dataclasses import dataclass
@@ -23,11 +9,7 @@ import streamlit as st
 from db import healthcheck
 import queries as q
 
-
-# ---------------------------------------------------------------------------
 # Filter state object
-# ---------------------------------------------------------------------------
-
 @dataclass(frozen=True)
 class Filters:
     date_from: date
@@ -47,10 +29,7 @@ class Filters:
             "demand_levels": self.demand_levels or None,
         }
 
-
-# ---------------------------------------------------------------------------
 # Sidebar — filters + DB status
-# ---------------------------------------------------------------------------
 
 def render_sidebar_filters() -> Filters:
     """Render the shared sidebar and return the user's selections."""
@@ -138,9 +117,7 @@ def render_about_box() -> None:
     )
 
 
-# ---------------------------------------------------------------------------
 # Formatting helpers
-# ---------------------------------------------------------------------------
 
 def fmt_currency(value: float | None) -> str:
     if value is None or pd.isna(value):
@@ -168,9 +145,7 @@ def fmt_pct(value: float | None, digits: int = 1) -> str:
     return f"{value:,.{digits}f}%"
 
 
-# ---------------------------------------------------------------------------
 # Page header
-# ---------------------------------------------------------------------------
 
 def page_header(title: str, subtitle: str | None = None, icon: str = "📊") -> None:
     st.markdown(f"## {icon}  {title}")

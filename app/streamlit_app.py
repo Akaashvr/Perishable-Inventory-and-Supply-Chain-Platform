@@ -1,13 +1,3 @@
-"""
-streamlit_app.py — Perishable Supply Chain Dashboard
-=====================================================
-
-Layout
-------
-  [Left Sidebar]  collapsible, filters only
-  [Main Column]   top-tab navigation → page content
-  [Right Column]  Query assistant chat panel
-"""
 
 from __future__ import annotations
 
@@ -23,10 +13,9 @@ import queries as q
 from theme import C, CHART_COLORS, inject_css, plotly_layout, section_header, app_header
 from ai_chat import render_ai_chat
 
-# ─── Page config ──────────────────────────────────────────────────────────────
+# Page config
 st.set_page_config(
     page_title="Perishable Supply Chain",
-    page_icon="https://cdn.jsdelivr.net/npm/remixicon@3.5.0/icons/Nature/leaf-line.svg",
     layout="wide",
     initial_sidebar_state="expanded",
 )
@@ -34,13 +23,13 @@ st.set_page_config(
 inject_css()
 
 
-# ─── Session state defaults ───────────────────────────────────────────────────
+# Session state defaults 
 for _k, _v in {"chat_history": [], "ai_input": ""}.items():
     if _k not in st.session_state:
         st.session_state[_k] = _v
 
 
-# ─── Sidebar — filters only ───────────────────────────────────────────────────
+# Sidebar — filters only 
 with st.sidebar:
     ok, _ = healthcheck()
     dot = "ri-checkbox-blank-circle-fill"
@@ -114,7 +103,7 @@ fkw = dict(
 )
 
 
-# ─── Chart helpers ────────────────────────────────────────────────────────────
+# Chart helpers 
 
 def _fig(fig_obj: go.Figure, height: int = 400) -> go.Figure:
     """Apply the shared dark layout to any Plotly figure."""
@@ -139,9 +128,11 @@ def _line(df: pd.DataFrame, x: str, y: str | list, title: str = "",
                 mode="lines",
                 line=dict(color=c, width=2.5, shape="spline", smoothing=1.2),
                 fill="tozeroy",
-                fillcolor=c.replace(")", ", 0.08)").replace("rgb", "rgba")
-                          if c.startswith("rgb") else f"{c}14",
-                hovertemplate=f"<b>%{{x}}</b><br>{label}: %{{y:,.0f}}<extra></extra>",
+                fillcolor=(
+                    c.replace(")", ", 0.08)").replace("rgb", "rgba")
+                    if c.startswith("rgb")
+                    else f'rgba({int(c[1:3],16)}, {int(c[3:5],16)}, {int(c[5:7],16)}, 0.08)'
+                ),
             )
         )
 
@@ -216,7 +207,7 @@ def _no_data() -> None:
     st.info("No data matches the current filters. Try widening the date range.")
 
 
-# ─── Page renders ─────────────────────────────────────────────────────────────
+# Page renders
 
 def page_overview() -> None:
     # KPIs
@@ -658,7 +649,7 @@ def page_explorer() -> None:
     )
 
 
-# ─── Main layout ──────────────────────────────────────────────────────────────
+# Main layout
 col_main, col_ai = st.columns([5, 1.8], gap="medium")
 
 with col_main:

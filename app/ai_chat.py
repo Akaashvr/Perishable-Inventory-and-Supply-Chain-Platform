@@ -1,29 +1,14 @@
-"""
-ai_chat.py
-==========
-
-Right-panel query assistant for the dashboard.
-
-Fill in API_KEY and MODEL before deploying.
-The assistant knows the Star Schema structure and can:
-  - Answer natural language questions about the data
-  - Suggest which dashboard page to visit
-  - Generate example SQL queries
-"""
-
 from __future__ import annotations
-
 import json
 import requests
 import streamlit as st
 
 from theme import C
 
-# ─── Configure these ──────────────────────────────────────────────────────────
 API_KEY  = ""   # ← paste your API key here
 MODEL    = ""   # ← paste your model name here  e.g. claude-sonnet-4-20250514
 API_URL  = "https://api.anthropic.com/v1/messages"
-# ─────────────────────────────────────────────────────────────────────────────
+
 
 _SYSTEM_PROMPT = """
 You are a concise data assistant for a Perishable Inventory & Supply Chain
@@ -88,36 +73,24 @@ def _call_api(messages: list[dict]) -> str:
 
 def render_ai_chat() -> None:
     """Render the right-panel AI assistant."""
-    # ── Header ────────────────────────────────────────────────────────────────
+    # Header
     st.markdown(
         """
         <div class="ai-panel-header">
-          <div class="ai-icon"><i class="ri-chat-3-line" style="color:white;font-size:14px"></i></div>
           <div>
-            <div class="ai-title">Query Assistant</div>
-            <div class="ai-sub">Ask about data or navigate pages</div>
+            <div class="ai-title">Ask a question about your supply chain data.</div>
           </div>
         </div>
         """,
         unsafe_allow_html=True,
     )
 
-    # ── Session state ──────────────────────────────────────────────────────────
+    # Session state
     if "chat_history" not in st.session_state:
         st.session_state.chat_history = []
 
-    # ── Suggested prompts ─────────────────────────────────────────────────────
+    # Suggested prompts
     if not st.session_state.chat_history:
-        st.markdown(
-            f"""
-            <div class="chat-empty">
-                <i class="ri-sparkling-line" style="font-size:22px;color:{C['dim']}"></i>
-                <br>Ask a question about your supply chain data.<br><br>
-                <b style="color:{C['muted']}">Try:</b>
-            </div>
-            """,
-            unsafe_allow_html=True,
-        )
         suggestions = [
             "Which region has highest waste?",
             "Show SQL for supplier ranking",
@@ -131,7 +104,7 @@ def render_ai_chat() -> None:
                 st.session_state.chat_history.append({"role": "assistant", "content": reply})
                 st.rerun()
 
-    # ── Chat history ──────────────────────────────────────────────────────────
+    # Chat history 
     chat_container = st.container()
     with chat_container:
         for msg in st.session_state.chat_history:
@@ -146,7 +119,7 @@ def render_ai_chat() -> None:
                     unsafe_allow_html=True,
                 )
 
-    # ── Input ─────────────────────────────────────────────────────────────────
+    # Input
     st.markdown("<div style='height:8px'></div>", unsafe_allow_html=True)
 
     user_input = st.text_input(
@@ -173,16 +146,3 @@ def render_ai_chat() -> None:
         if st.button("Clear", key="ai_clear"):
             st.session_state.chat_history = []
             st.rerun()
-
-    # ── Config notice when not set ─────────────────────────────────────────────
-    if not API_KEY or not MODEL:
-        st.markdown(
-            f"""
-            <div class="chat-bubble-system" style="margin-top:10px">
-                <i class="ri-settings-3-line"></i>
-                Open <code>app/ai_chat.py</code> and set<br>
-                <code>API_KEY</code> and <code>MODEL</code> to enable.
-            </div>
-            """,
-            unsafe_allow_html=True,
-        )

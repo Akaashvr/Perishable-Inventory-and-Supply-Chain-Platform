@@ -1,19 +1,3 @@
-"""
-queries.py
-==========
-
-All SQL queries used by the dashboard live here.
-
-Conventions
------------
-* Every query function takes plain Python args (lists, strings, dates) and
-  passes them as bind parameters — never f-string interpolation.
-* Every function is wrapped in ``@st.cache_data`` with a TTL so we don't
-  hammer the Neon free-tier instance on every interaction.
-* The star schema views (``dim_product``, ``dim_store``, ``dim_supplier``,
-  ``fact_inventory``) are built by dbt and live in the same Postgres schema
-  as the OLTP tables.
-"""
 
 from __future__ import annotations
 
@@ -25,15 +9,10 @@ import streamlit as st
 
 from db import run_query
 
-# How long to cache results (seconds). The data is updated by batch
-# ingestion, so a 10-minute TTL is a reasonable compromise between
-# freshness and minimising Neon CU usage.
 DEFAULT_TTL = 600
 
 
-# ---------------------------------------------------------------------------
 # Filter option queries (cheap, low-cardinality lookups for the sidebar)
-# ---------------------------------------------------------------------------
 
 @st.cache_data(ttl=DEFAULT_TTL, show_spinner=False)
 def get_date_bounds() -> tuple[date, date]:
@@ -75,10 +54,7 @@ def get_demand_levels() -> list[str]:
     return df["demand_level"].tolist()
 
 
-# ---------------------------------------------------------------------------
 # Helper: turn list filters into safe SQL fragments
-# ---------------------------------------------------------------------------
-
 def _build_filter_clauses(
     date_from: date,
     date_to: date,
@@ -109,9 +85,7 @@ def _build_filter_clauses(
     return where, params
 
 
-# ---------------------------------------------------------------------------
 # KPI / summary queries
-# ---------------------------------------------------------------------------
 
 @st.cache_data(ttl=DEFAULT_TTL, show_spinner="Computing KPIs…")
 def get_kpis(
@@ -142,9 +116,7 @@ def get_kpis(
     return run_query(sql, params)
 
 
-# ---------------------------------------------------------------------------
 # Time-series queries
-# ---------------------------------------------------------------------------
 
 @st.cache_data(ttl=DEFAULT_TTL, show_spinner="Loading trend data…")
 def get_daily_trend(
@@ -210,9 +182,7 @@ def get_moving_avg(
     return run_query(sql, params)
 
 
-# ---------------------------------------------------------------------------
 # Product / category queries
-# ---------------------------------------------------------------------------
 
 @st.cache_data(ttl=DEFAULT_TTL, show_spinner="Ranking products…")
 def get_top_products(
@@ -280,9 +250,7 @@ def get_category_breakdown(
     return run_query(sql, params)
 
 
-# ---------------------------------------------------------------------------
 # Supplier queries
-# ---------------------------------------------------------------------------
 
 @st.cache_data(ttl=DEFAULT_TTL, show_spinner="Ranking suppliers…")
 def get_supplier_rankings(
@@ -327,9 +295,7 @@ def get_supplier_rankings(
     return run_query(sql, params)
 
 
-# ---------------------------------------------------------------------------
 # Store / region queries
-# ---------------------------------------------------------------------------
 
 @st.cache_data(ttl=DEFAULT_TTL, show_spinner="Summarising stores…")
 def get_region_performance(
@@ -386,9 +352,7 @@ def get_region_category_heatmap(
     return run_query(sql, params)
 
 
-# ---------------------------------------------------------------------------
 # Waste analysis queries
-# ---------------------------------------------------------------------------
 
 @st.cache_data(ttl=DEFAULT_TTL, show_spinner="Computing waste analytics…")
 def get_waste_by_sensitivity(
@@ -452,10 +416,7 @@ def get_top_wasted_products(
     """
     return run_query(sql, params)
 
-
-# ---------------------------------------------------------------------------
 # Promotion impact
-# ---------------------------------------------------------------------------
 
 @st.cache_data(ttl=DEFAULT_TTL, show_spinner="Comparing promotional impact…")
 def get_promo_vs_nonpromo(
@@ -487,9 +448,7 @@ def get_promo_vs_nonpromo(
     return run_query(sql, params)
 
 
-# ---------------------------------------------------------------------------
 # Raw sample (for the data-explorer tab)
-# ---------------------------------------------------------------------------
 
 @st.cache_data(ttl=DEFAULT_TTL, show_spinner="Fetching sample rows…")
 def get_sample_transactions(
