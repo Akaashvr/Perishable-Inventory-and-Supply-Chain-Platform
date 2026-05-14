@@ -5,8 +5,8 @@ import streamlit as st
 
 from theme import C
 
-API_KEY  = ""   # ← paste your API key here
-MODEL    = ""   # ← paste your model name here  e.g. claude-sonnet-4-20250514
+API_KEY  = "AIzaSyAc1cCg6NdYlnowaDu0TyJ-4XR8tsFdLio"
+MODEL    = "Gemini 2.5 Flash "
 API_URL  = "https://api.anthropic.com/v1/messages"
 
 
