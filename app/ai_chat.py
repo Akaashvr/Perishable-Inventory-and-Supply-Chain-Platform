@@ -1,25 +1,8 @@
-"""
-ai_chat.py
-==========
-
-Right-panel query assistant powered by Gemini 2.5 Flash.
-
-Capabilities (all via Gemini function calling):
-    • query_database(sql)       — runs read-only SELECT/WITH on the live DB
-    • navigate_to_tab(tab, …)   — switches the main tab + applies filters
-
-Tab switching works by injecting JS that clicks the matching tab button.
-Filter pre-fill works only if your sidebar multiselects in streamlit_app.py
-have `key="filter_regions"`, `key="filter_categories"`, and
-`key="filter_demand_levels"`. If they don't, the tab still switches and the
-data the AI cites is still correct — just the sidebar widget won't auto-fill.
-"""
-
 from __future__ import annotations
 
 import json
 import re
-
+import os
 import requests
 import streamlit as st
 import streamlit.components.v1 as components
@@ -27,18 +10,16 @@ import streamlit.components.v1 as components
 from db import run_query
 from theme import C
 
-# ─── Gemini configuration ─────────────────────────────────────────────────────
-# NOTE: This key is exposed in source. For production use, replace with
+# Gemini configuration
 #   os.getenv("GEMINI_API_KEY", "")
-API_KEY  = "AIzaSyAc1cCg6NdYlnowaDu0TyJ-4XR8tsFdLio"
+API_KEY = os.getenv("API_KEY")
 MODEL    = "gemini-2.5-flash"
 API_URL  = f"https://generativelanguage.googleapis.com/v1beta/models/{MODEL}:generateContent?key={API_KEY}"
 
-# Tabs available in streamlit_app.py (must match the labels exactly).
 TAB_NAMES = ["Overview", "Products", "Suppliers", "Regions",
              "Waste", "Promotions", "Data Explorer"]
 
-# ─── System prompt: full schema + page context ────────────────────────────────
+# System prompt: full schema + page context
 SYSTEM_PROMPT = """
 You are a concise data assistant embedded in a BI dashboard for a perishable
 inventory & supply chain platform. The data lives in a Postgres star schema:
@@ -83,7 +64,7 @@ Workflow:
   • Never write more than ~120 words. Plain text only. No markdown headers.
 """.strip()
 
-# ─── Function declarations (Gemini tools) ─────────────────────────────────────
+# Function declarations (Gemini tools)
 TOOLS = [{
     "functionDeclarations": [
         {
@@ -137,7 +118,7 @@ TOOLS = [{
     ]
 }]
 
-# ─── SQL safety ───────────────────────────────────────────────────────────────
+# SQL safety
 _SQL_FORBIDDEN = re.compile(
     r"\b(INSERT|UPDATE|DELETE|DROP|ALTER|CREATE|TRUNCATE|GRANT|"
     r"REVOKE|COPY|EXECUTE|VACUUM|ANALYZE|LOCK|MERGE)\b",
@@ -162,7 +143,7 @@ def _safe_sql(sql: str) -> tuple[bool, str, str]:
     return True, "", sql
 
 
-# ─── Tool executors ───────────────────────────────────────────────────────────
+# Tool executors
 def _exec_query(sql: str) -> dict:
     ok, err, safe = _safe_sql(sql)
     if not ok:
@@ -172,7 +153,6 @@ def _exec_query(sql: str) -> dict:
         if df.empty:
             return {"row_count": 0, "result": "No rows returned."}
         df = df.head(50)
-        # Truncate wide string cells so the response stays compact
         for col in df.select_dtypes(include="object").columns:
             df[col] = df[col].astype(str).str.slice(0, 80)
         return {
@@ -180,7 +160,7 @@ def _exec_query(sql: str) -> dict:
             "columns": list(df.columns),
             "rows_csv": df.to_csv(index=False),
         }
-    except Exception as e:                                       # noqa: BLE001
+    except Exception as e:             
         return {"error": str(e)[:240]}
 
 
@@ -192,8 +172,6 @@ def _exec_navigate(args: dict) -> dict:
     st.session_state["pending_nav"] = tab
 
     applied: list[str] = []
-    # These keys map to the multiselects in streamlit_app.py — IF those
-    # multiselects have matching key= args. Harmless to set either way.
     for arg_key, state_key in [
         ("regions",       "filter_regions"),
         ("categories",    "filter_categories"),
@@ -247,7 +225,7 @@ def _chat_turn(user_message: str) -> str:
             return f"API error {code}: {snippet}"
         except requests.exceptions.Timeout:
             return "Request timed out after 45s. Please try again."
-        except Exception as e:                                   # noqa: BLE001
+        except Exception as e:                            
             return f"Network error: {e}"
 
         candidates = response.get("candidates", [])
@@ -279,9 +257,8 @@ def _chat_turn(user_message: str) -> str:
                     }
                 })
             history.append({"role": "user", "parts": responses})
-            continue  # send results back, get next response
+            continue 
 
-        # Plain text response — we're done.
         text = "\n".join(t for t in text_parts if t).strip()
         return text or "(empty reply)"
 
