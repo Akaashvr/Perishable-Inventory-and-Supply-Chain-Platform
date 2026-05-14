@@ -500,7 +500,8 @@ hr {{ border-color: {C["border"]} !important; margin: 1rem 0; }}
 
 
 def inject_css() -> None:
-    st.markdown(f"<style>{_CSS}</style>", unsafe_allow_html=True)
+    clean_css = _CSS.replace("}}", "}").replace("{{", "{")
+    st.markdown(f"<style>{clean_css}</style>", unsafe_allow_html=True)
 
 
 # HTML helpers
