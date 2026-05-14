@@ -212,7 +212,7 @@ def _exec_navigate(args: dict) -> dict:
     }
 
 
-# ─── Gemini API plumbing ──────────────────────────────────────────────────────
+# Gemini API plumbing
 def _gemini_call(history: list[dict]) -> dict:
     payload = {
         "system_instruction": {"parts": [{"text": SYSTEM_PROMPT}]},
@@ -288,7 +288,7 @@ def _chat_turn(user_message: str) -> str:
     return "Conversation exceeded the function-call limit."
 
 
-# ─── UI ───────────────────────────────────────────────────────────────────────
+#  UI 
 _SUGGESTIONS = [
     "Top 5 suppliers by profit",
     "Which region has highest waste?",
@@ -298,7 +298,7 @@ _SUGGESTIONS = [
 
 
 def render_ai_chat() -> None:
-    # ─ Header ─────────────────────────────────────────────────────────────────
+    # Header 
     st.markdown(
         """
         <div class="ai-panel-header">
@@ -310,11 +310,11 @@ def render_ai_chat() -> None:
         unsafe_allow_html=True,
     )
 
-    # ─ State init ─────────────────────────────────────────────────────────────
+    # State init
     st.session_state.setdefault("gemini_history", [])
     st.session_state.setdefault("chat_display", [])
 
-    # ─ Handle a pending suggestion click (queued on previous run) ────────────
+    # Handle a pending suggestion click (queued on previous run)
     pending = st.session_state.pop("ai_pending_msg", None)
     if pending:
         with st.spinner("Thinking…"):
@@ -322,7 +322,7 @@ def render_ai_chat() -> None:
         st.session_state.chat_display.append({"role": "user",      "content": pending})
         st.session_state.chat_display.append({"role": "assistant", "content": reply})
 
-    # ─ Empty state: show suggestions ──────────────────────────────────────────
+    # Empty state: show suggestions
     if not st.session_state.chat_display:
         st.markdown(
             f"""
@@ -336,7 +336,7 @@ def render_ai_chat() -> None:
                 st.session_state.ai_pending_msg = s
                 st.rerun()
 
-    # ─ History ────────────────────────────────────────────────────────────────
+    # History
     for msg in st.session_state.chat_display:
         # escape HTML, preserve line breaks
         body = (msg["content"]
@@ -347,7 +347,7 @@ def render_ai_chat() -> None:
         cls = "chat-bubble-user" if msg["role"] == "user" else "chat-bubble-assistant"
         st.markdown(f'<div class="{cls}">{body}</div>', unsafe_allow_html=True)
 
-    # ─ Input form ─────────────────────────────────────────────────────────────
+    # Input form
     with st.form("ai_chat_form", clear_on_submit=True):
         user_input = st.text_input(
             "Message",
@@ -376,7 +376,7 @@ def render_ai_chat() -> None:
         )
         st.rerun()
 
-    # ─ Config notice when key missing ─────────────────────────────────────────
+    # Config notice when key missing
     if not API_KEY or not MODEL:
         st.markdown(
             """
@@ -388,7 +388,7 @@ def render_ai_chat() -> None:
             unsafe_allow_html=True,
         )
 
-    # ─ Apply pending tab navigation via JS injection ──────────────────────────
+    # Apply pending tab navigation via JS injection
     target = st.session_state.pop("pending_nav", None)
     if target:
         components.html(
