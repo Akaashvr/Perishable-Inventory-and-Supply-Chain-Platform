@@ -531,7 +531,6 @@ def app_header(db_ok: bool) -> None:
     st.markdown(
         f"""
         <div class="app-header">
-          <div class="logo-box"><i class="ri-leaf-line" style="color:#070D18"></i></div>
           <div>
             <div class="app-title">Perishable Supply Chain</div>
             <div class="app-sub">Live analytics — Neon Postgres Star Schema</div>

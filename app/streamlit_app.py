@@ -39,7 +39,6 @@ with st.sidebar:
     st.markdown(
         f"""
         <div class="sidebar-brand">
-          <div class="sb-logo"><i class="ri-leaf-line" style="color:#070D18"></i></div><br>
           <div class="sb-title">Supply Chain</div>
           <div class="sb-sub">Perishable Inventory Platform</div>
           <div class="{badge_cls}">
