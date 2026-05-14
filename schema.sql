@@ -10,27 +10,23 @@ DROP TABLE IF EXISTS categories CASCADE;
 
 CREATE TABLE regions (
     region_id SERIAL PRIMARY KEY,
-    region_name VARCHAR(100) NOT NULL UNIQUE
-);
+    region_name VARCHAR(100) NOT NULL UNIQUE );
 
 CREATE TABLE categories (
     category_id SERIAL PRIMARY KEY,
-    category_name VARCHAR(100) NOT NULL UNIQUE
-);
+    category_name VARCHAR(100) NOT NULL UNIQUE );
 
 CREATE TABLE stores (
     store_id SERIAL PRIMARY KEY,
     store_code VARCHAR(50) NOT NULL UNIQUE,
     region_id INTEGER NOT NULL REFERENCES regions(region_id),
-    CONSTRAINT chk_store_code_nonempty CHECK (LENGTH(TRIM(store_code)) > 0)
-);
+    CONSTRAINT chk_store_code_nonempty CHECK (LENGTH(TRIM(store_code)) > 0));
 
 CREATE TABLE suppliers (
     supplier_id SERIAL PRIMARY KEY,
     supplier_code VARCHAR(50) NOT NULL UNIQUE,
     supplier_score NUMERIC(5,2) NOT NULL DEFAULT 0.00,
-    CONSTRAINT chk_supplier_score CHECK (supplier_score BETWEEN 0 AND 100)
-);
+    CONSTRAINT chk_supplier_score CHECK (supplier_score BETWEEN 0 AND 100));
 
 CREATE TABLE products (
     product_id SERIAL PRIMARY KEY,
@@ -44,7 +40,7 @@ CREATE TABLE products (
     CONSTRAINT chk_spoilage_sens CHECK (spoilage_sensitivity IN ('Low', 'Medium', 'High'))
 );
 
-CREATE TABLE promotions (
+create TABLE promotions (
     promotion_id SERIAL PRIMARY KEY,
     promotion_name VARCHAR(200) NOT NULL UNIQUE,
     discount_pct NUMERIC(5,2) NOT NULL DEFAULT 0.00,

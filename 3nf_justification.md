@@ -1,6 +1,6 @@
 # 3NF Design Justification Report
 **EAS 550 – Perishable Inventory Intelligence Platform**  
-Team 9: Harish Sondagar, Sidharth Saholiya, Akaash Vontivillu, Riddhi Vaghani
+Team 9: Harish Sondagar, Sidharth Saholiya , Akaash Vontivillu, Riddhi Vaghani
 
 ---
 
