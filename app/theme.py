@@ -229,7 +229,7 @@ _CSS = f"""
     font-weight: 500;
 }}
 [data-testid="metric-container"] [data-testid="stMetricValue"] {{
-    color: {C["text"]} !important;
+    color: white !important;
     font-size: 26px !important;
     font-weight: 700;
 }}
