@@ -107,7 +107,7 @@ _CSS = f"""
         radial-gradient(ellipse 50% 50% at 92% 55%, rgba(255,133,51,.05) 0%, transparent 100%),
         radial-gradient(ellipse 45% 40% at 52% 3%,  rgba(0,168,232,.04)  0%, transparent 100%);
     pointer-events: none;
-    z-index: 0;
+    z-index: -1;
 }}
 
 /* ── Hide Streamlit chrome ── */
