@@ -111,6 +111,13 @@ _CSS = f"""
 }}
 
 /* ── Hide Streamlit chrome ── */
+
+
+[data-testid="stSidebar"],
+[data-testid="stSidebar"] * {{
+    color: white !important;
+}}
+
 #MainMenu, footer, header {{ display: none !important; }}
 [data-testid="stSidebarNav"]  {{ display: none !important; }}
 [data-testid="stDecoration"]  {{ display: none !important; }}
@@ -238,6 +245,12 @@ _CSS = f"""
 [data-testid="stMetricValue"] * {{
     color: white !important;
 }}
+
+[data-testid="stMetricLabel"],
+[data-testid="stMetricLabel"] * {{
+    color: white !important;
+}}
+
 
 [data-testid="stMetricDelta"] {{
     font-size: 12px !important;
