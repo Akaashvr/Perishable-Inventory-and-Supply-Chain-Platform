@@ -98,17 +98,7 @@ _CSS = f"""
 }}
 
 /* Ambient colour glows (fresh green + warm orange + cold blue) */
-.stApp::before {{
-    content: '';
-    position: fixed;
-    inset: 0;
-    background:
-        radial-gradient(ellipse 65% 55% at 8%  42%, rgba(0,200,150,.07)  0%, transparent 100%),
-        radial-gradient(ellipse 50% 50% at 92% 55%, rgba(255,133,51,.05) 0%, transparent 100%),
-        radial-gradient(ellipse 45% 40% at 52% 3%,  rgba(0,168,232,.04)  0%, transparent 100%);
-    pointer-events: none;
-    z-index: -1;
-}}
+
 
 /* ── Hide Streamlit chrome ── */
 #MainMenu, footer, header {{ display: none !important; }}
