@@ -233,6 +233,12 @@ _CSS = f"""
     font-size: 26px !important;
     font-weight: 700;
 }}
+
+[data-testid="stMetricValue"],
+[data-testid="stMetricValue"] * {{
+    color: white !important;
+}}
+
 [data-testid="stMetricDelta"] {{
     font-size: 12px !important;
     font-weight: 500;
