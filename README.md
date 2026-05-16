@@ -4,8 +4,9 @@ EAS 550, Team 9. A three phase data engineering project that takes a raw perisha
 
 Live app: https://perishable-inventory-and-supply-chain.onrender.com/
 
-Phase 1  https://youtu.be/H3kzdN9K7yk
-Final phase demo:
+Phase 1:  https://youtu.be/H3kzdN9K7yk  
+
+Final Phase Demo Video: https://youtu.be/V4FKrAy5uCE  
 
 ---
 
